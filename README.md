@@ -1,4 +1,4 @@
 ice-road
 ========
 
-clojure library for working with paths
+a clojure library for working with paths of files or URLs
