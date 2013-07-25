@@ -6,7 +6,7 @@
   [road-path]
   (reduce (fn [path el]
             (cond (= el "..") (butlast path)
-                  (= el ".") path
+                  (#{"" "."} el) path
                   :default (concat path [el])))
           []
           road-path))
@@ -17,21 +17,26 @@
   (to-string [this] (str (string/join java.io.File/separatorChar path)
                          (when (not (contains? #{nil "" []} extension))
                            (str \. extension))))
-  (as-object [this] (-> this protocol/to-string java.io.File))
+  (as-object [this] (-> this protocol/to-string java.io.File.))
   (under? [this that] (let [this-path (canonical-path path)
                             that-path (canonical-path (:path that))]
                         (and (= extension (:extension that))
-                           (> (count this-path)
-                              (count that-path)
-                           (= this-path
-                              (take (count this-path) that-path))))))
+                             (> (count this-path)
+                                (count that-path))
+                             (= (take (count that-path) this-path)
+                                that-path))))
   (absolute? [this] (or (= (first path) "")
                         (= path [])))
-  (root? [this] (= path []))
+  (root? [this] (#{[""] []} path))
   (component [this] (str (last path) (when extension (str \. extension))))
   (extension [this] extension)
   (parameters [this] nil)
-  (append [this that] (map->Filepath {:path (concat path (:path that))
+  (append [this that] (map->Filepath {:path (concat (reverse
+                                                     (drop-while empty?
+                                                                 (reverse
+                                                                  path)))
+                                                    (drop-while empty?
+                                                                (:path that)))
                                       :extension (:extension that)}))
   (equivalent? [this that] (and (= extension (:extension that))
                                (= (canonical-path path)
