@@ -20,8 +20,7 @@
   (as-object [this] (-> this protocol/to-string java.io.File.))
   (under? [this that] (let [this-path (canonical-path path)
                             that-path (canonical-path (:path that))]
-                        (and (= extension (:extension that))
-                             (> (count this-path)
+                        (and (> (count this-path)
                                 (count that-path))
                              (= (take (count that-path) this-path)
                                 that-path))))

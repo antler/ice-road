@@ -89,7 +89,15 @@
                          (url/<-string "http://ubu.com/"))))
   (testing "file under file"
     (is (protocol/under? (file/<-string (mkf ["" "usr" "bin" "ls"]))
-                         (file/<-string (mkf ["" "usr" "bin" ""]))))))
+                         (file/<-string (mkf ["" "usr" "bin" ""])))))
+  (testing "higher level under"
+    (is (apply path/under?
+               (map url/<-string
+                    ["a/b/c/d/e/f/g.html"
+                     "a/b/c/d/e/f"
+                     "a/b/c/d/e"
+                     "a/b/c/d"
+                     "a/b/c"])))))
 
 (deftest absolute?
   (testing "url absolute"
@@ -167,7 +175,14 @@
            (protocol/to-string
             (protocol/append (file/<-string (mkf ["" "Media" "Video"
                                                   "embarrassing.flv"]))
-                             (file/<-string (mkf ["pov.mpg"]))))))))
+                             (file/<-string (mkf ["pov.mpg"])))))))
+  (testing "higher level append"
+    (is (= "http://www.a.com/b/c/d/e/f.html"
+           (protocol/to-string
+            (path/append (url/<-string "http://www.a.com")
+                         (url/<-string "b/c")
+                         (url/<-string "/d/e")
+                         (url/<-string "f.html")))))))
                 
 (deftest equivalent?
   (testing "url equivalence"
@@ -176,7 +191,12 @@
   (testing "file equivalence"
     (is (protocol/equivalent?
          (file/<-string (mkf ["" "tmp" ".." "usr" ".." "home"]))
-         (file/<-string (mkf ["" "home"]))))))
+         (file/<-string (mkf ["" "home"])))))
+  (testing "higher level equivalent"
+    (is (path/equivalent?
+         (file/<-string (mkf ["" "opt" "lib" "cfg"]))
+         (url/<-string "file:///opt/lib/cfg")
+         (url/<-string "ftp://opt/lib/cfg")))))
 
 (deftest parent
   (testing "url parent"
@@ -189,3 +209,4 @@
     (is (= (file/<-string (mkf ["" "usr" "share" "games"]))
            (protocol/parent (file/<-string (mkf ["" "usr" "share" "games"
                                                  "nethack.cfg"])))))))
+

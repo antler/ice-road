@@ -21,8 +21,6 @@
           that-path (remove empty? (:path that))]
       (and (= protocol
               (:protocol that))
-           (= extension
-              (:extension that))
            (> (count this-path)
               (count that-path))
            (= (take (count that-path) path)
